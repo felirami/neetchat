@@ -15,6 +15,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Suppress console errors from browser extensions
+              const originalError = console.error;
+              console.error = function(...args) {
+                const message = args.join(' ');
+                // Filter out Chrome extension errors
+                if (message.includes('chrome.runtime.sendMessage') || 
+                    message.includes('Extension ID') ||
+                    message.includes('inpage.js')) {
+                  return;
+                }
+                originalError.apply(console, args);
+              };
+            `,
+          }}
+        />
+      </head>
       <body>
         <Providers>
           <NavBar />
@@ -24,4 +44,3 @@ export default function RootLayout({
     </html>
   );
 }
-
