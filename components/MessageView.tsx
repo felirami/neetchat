@@ -64,62 +64,90 @@ export function MessageView({ conversation }: MessageViewProps) {
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex items-center justify-center text-gray-500">
-        Select a conversation to start chatting
+      <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-white">
+        <div className="text-center space-y-4">
+          <div className="text-6xl">💬</div>
+          <div className="text-xl font-semibold text-gray-700">Select a conversation</div>
+          <div className="text-sm text-gray-500">Choose a chat from the sidebar to start messaging</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="font-semibold">
-          {conversation.peerAddress.slice(0, 6)}...
-          {conversation.peerAddress.slice(-4)}
-        </h2>
+    <div className="flex-1 flex flex-col bg-white">
+      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-500 to-purple-600">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 font-semibold text-sm">
+            {conversation.peerAddress.slice(2, 4).toUpperCase()}
+          </div>
+          <div>
+            <h2 className="font-bold text-white">
+              {conversation.peerAddress.slice(0, 6)}...
+              {conversation.peerAddress.slice(-4)}
+            </h2>
+            <div className="text-xs text-blue-100">Active now</div>
+          </div>
+        </div>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
         {isLoading ? (
-          <div className="text-gray-500">Loading messages...</div>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+              <div className="text-gray-500 mt-2">Loading messages...</div>
+            </div>
+          </div>
         ) : (
           messages.map((message) => {
             const isMe = message.senderAddress.toLowerCase() === address?.toLowerCase();
             return (
               <div
                 key={message.id}
-                className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+                className={`flex ${isMe ? "justify-end" : "justify-start"} items-end gap-2`}
               >
+                {!isMe && (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
+                    {message.senderAddress.slice(2, 4).toUpperCase()}
+                  </div>
+                )}
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${
                     isMe
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-800"
+                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-br-none"
+                      : "bg-white text-gray-800 rounded-bl-none border border-gray-200"
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
-                  <p className="text-xs mt-1 opacity-70">
-                    {new Date(message.sent).toLocaleTimeString()}
+                  <p className="text-sm leading-relaxed">{message.content}</p>
+                  <p className={`text-xs mt-2 ${isMe ? "text-blue-100" : "text-gray-400"}`}>
+                    {new Date(message.sent).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
+                {isMe && (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold">
+                    {address?.slice(2, 4).toUpperCase()}
+                  </div>
+                )}
               </div>
             );
           })
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex gap-2">
+      <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="flex gap-3">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="input-field flex-1"
           />
           <button
             onClick={sendMessage}
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            disabled={!newMessage.trim()}
+            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold"
           >
             Send
           </button>

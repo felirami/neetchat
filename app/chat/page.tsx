@@ -25,10 +25,12 @@ export default function ChatPage() {
 
   if (!isConnected) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-24">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">NeetChat</h1>
-          <p className="text-lg mb-8">Connect your wallet to start chatting</p>
+      <main className="flex min-h-screen flex-col items-center justify-center p-8 md:p-24">
+        <div className="text-center space-y-6 max-w-md">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            NeetChat
+          </h1>
+          <p className="text-xl text-gray-700">Connect your wallet to start chatting</p>
           <WalletConnect />
         </div>
       </main>
@@ -36,13 +38,13 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="flex h-screen relative">
-      <div className="flex flex-col w-64 border-r border-gray-200">
+    <main className="flex h-screen relative bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="flex flex-col w-64 bg-white border-r border-gray-200 shadow-sm">
         <ChatList
           onSelectConversation={setSelectedConversation}
           selectedConversation={selectedConversation || undefined}
         />
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 bg-gray-50">
           <SelfVerification />
         </div>
       </div>
