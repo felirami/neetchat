@@ -5,6 +5,7 @@ import { Conversation } from "@xmtp/xmtp-js";
 import { ChatList } from "@/components/ChatList";
 import { MessageView } from "@/components/MessageView";
 import { MiniAppPanel } from "@/components/MiniAppPanel";
+import { SelfVerification } from "@/components/SelfVerification";
 import { useAccount } from "wagmi";
 import { WalletConnect } from "@/components/WalletConnect";
 
@@ -33,10 +34,15 @@ export default function ChatPage() {
 
   return (
     <main className="flex h-screen relative">
-      <ChatList
-        onSelectConversation={setSelectedConversation}
-        selectedConversation={selectedConversation || undefined}
-      />
+      <div className="flex flex-col w-64 border-r border-gray-200">
+        <ChatList
+          onSelectConversation={setSelectedConversation}
+          selectedConversation={selectedConversation || undefined}
+        />
+        <div className="p-4 border-t border-gray-200">
+          <SelfVerification />
+        </div>
+      </div>
       <MessageView conversation={selectedConversation} />
       <MiniAppPanel onAction={handleAction} />
     </main>
