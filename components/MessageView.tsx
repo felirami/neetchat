@@ -29,6 +29,7 @@ export function MessageView({ conversation }: MessageViewProps) {
     let isMounted = true;
 
     async function loadMessages() {
+      if (!conversation) return;
       setIsLoading(true);
       try {
         const msgs = await conversation.messages();
@@ -48,6 +49,7 @@ export function MessageView({ conversation }: MessageViewProps) {
 
     // Set up message streaming with proper cleanup
     async function setupStream() {
+      if (!conversation) return;
       try {
         streamController = new AbortController();
         const stream = await conversation.streamMessages();
