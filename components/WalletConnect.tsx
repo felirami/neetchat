@@ -30,6 +30,7 @@ export function WalletConnect() {
   }
 
   // Prioritize WalletConnect for mobile-first
+  // WalletConnect connector will only exist if NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is set
   const sortedConnectors = [...connectors].sort((a, b) => {
     if (a.name.toLowerCase().includes("walletconnect")) return -1;
     if (b.name.toLowerCase().includes("walletconnect")) return 1;
