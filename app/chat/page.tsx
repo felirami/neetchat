@@ -5,6 +5,8 @@ import { Conversation } from "@xmtp/xmtp-js";
 import { ChatList } from "@/components/ChatList";
 import { MessageView } from "@/components/MessageView";
 import { MiniAppPanel } from "@/components/MiniAppPanel";
+import { ActionModal } from "@/components/ActionModal";
+import { PriceDisplay } from "@/components/PriceDisplay";
 import { SelfVerification } from "@/components/SelfVerification";
 import { useAccount } from "wagmi";
 import { WalletConnect } from "@/components/WalletConnect";
@@ -45,6 +47,16 @@ export default function ChatPage() {
       </div>
       <MessageView conversation={selectedConversation} />
       <MiniAppPanel onAction={handleAction} />
+      
+      {currentAction === "price" && (
+        <ActionModal
+          isOpen={true}
+          onClose={() => setCurrentAction(null)}
+          title="Token Prices"
+        >
+          <PriceDisplay />
+        </ActionModal>
+      )}
     </main>
   );
 }
