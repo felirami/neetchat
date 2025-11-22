@@ -7,6 +7,7 @@ import { MessageView } from "@/components/MessageView";
 import { MiniAppPanel } from "@/components/MiniAppPanel";
 import { ActionModal } from "@/components/ActionModal";
 import { PriceDisplay } from "@/components/PriceDisplay";
+import { TipAction } from "@/components/TipAction";
 import { SelfVerification } from "@/components/SelfVerification";
 import { useAccount } from "wagmi";
 import { WalletConnect } from "@/components/WalletConnect";
@@ -56,6 +57,13 @@ export default function ChatPage() {
         >
           <PriceDisplay />
         </ActionModal>
+      )}
+      
+      {currentAction === "tip" && (
+        <TipAction
+          recipientAddress={selectedConversation?.peerAddress || ""}
+          onClose={() => setCurrentAction(null)}
+        />
       )}
     </main>
   );
