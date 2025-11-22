@@ -92,11 +92,21 @@ export function useXMTP() {
     if (!client || !address) return null;
     
     try {
+      // Check if address can receive messages before creating conversation
+      const canMessageResult = await Client.canMessage(address);
+      if (!canMessageResult) {
+        throw new Error("This address is not reachable on XMTP. They may not have XMTP enabled.");
+      }
+
       const conversation = await client.conversations.newConversation(address);
       return conversation;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error starting conversation:", error);
-      throw error;
+      // Provide more helpful error messages
+      if (error.message?.includes("not reachable") || error.message?.includes("canMessage")) {
+        throw error;
+      }
+      throw new Error(error.message || "Failed to start conversation");
     }
   };
 

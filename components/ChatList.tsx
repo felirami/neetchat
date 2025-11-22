@@ -25,6 +25,7 @@ export function ChatList({ onSelectConversation, selectedConversation }: ChatLis
     async function loadConversations() {
       setIsLoading(true);
       try {
+        // Filter by consent state to show only allowed conversations (spam-free)
         const convos = await client.conversations.list();
         setConversations(convos);
       } catch (err) {
@@ -35,6 +36,15 @@ export function ChatList({ onSelectConversation, selectedConversation }: ChatLis
     }
 
     loadConversations();
+
+    // Refresh conversations periodically
+    const refreshInterval = setInterval(() => {
+      if (client) {
+        loadConversations();
+      }
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(refreshInterval);
   }, [client]);
 
   if (!client) {

@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import { Conversation, DecodedMessage } from "@xmtp/xmtp-js";
 import { useAccount } from "wagmi";
+import { useENS } from "@/hooks/useENS";
+import { formatAddressOrENS } from "@/lib/ens";
 
 interface MessageViewProps {
   conversation: Conversation | null;
@@ -13,7 +15,9 @@ export function MessageView({ conversation }: MessageViewProps) {
   const [messages, setMessages] = useState<DecodedMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { ensName } = useENS(conversation?.peerAddress || null);
 
   useEffect(() => {
     if (!conversation) {
@@ -21,29 +25,59 @@ export function MessageView({ conversation }: MessageViewProps) {
       return;
     }
 
+    let streamController: AbortController | null = null;
+    let isMounted = true;
+
     async function loadMessages() {
       setIsLoading(true);
       try {
         const msgs = await conversation.messages();
-        setMessages(msgs);
+        if (isMounted) {
+          setMessages(msgs);
+        }
       } catch (err) {
         console.error("Error loading messages:", err);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
 
     loadMessages();
 
-    const stream = conversation.streamMessages();
-    stream.then(async (stream) => {
-      for await (const message of stream) {
-        setMessages((prev) => [...prev, message]);
+    // Set up message streaming with proper cleanup
+    async function setupStream() {
+      try {
+        streamController = new AbortController();
+        const stream = await conversation.streamMessages();
+        
+        for await (const message of stream) {
+          if (streamController.signal.aborted || !isMounted) {
+            break;
+          }
+          setMessages((prev) => {
+            // Prevent duplicate messages
+            if (prev.some((m) => m.id === message.id)) {
+              return prev;
+            }
+            return [...prev, message];
+          });
+        }
+      } catch (err) {
+        if (!streamController?.signal.aborted && isMounted) {
+          console.error("Error streaming messages:", err);
+        }
       }
-    });
+    }
+
+    setupStream();
 
     return () => {
-      stream.then((s) => s.return?.());
+      isMounted = false;
+      if (streamController) {
+        streamController.abort();
+      }
     };
   }, [conversation]);
 
@@ -54,11 +88,15 @@ export function MessageView({ conversation }: MessageViewProps) {
   const sendMessage = async () => {
     if (!conversation || !newMessage.trim()) return;
 
+    setSendError(null);
     try {
       await conversation.send(newMessage);
       setNewMessage("");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error sending message:", err);
+      setSendError(err.message || "Failed to send message");
+      // Clear error after 5 seconds
+      setTimeout(() => setSendError(null), 5000);
     }
   };
 
@@ -83,8 +121,7 @@ export function MessageView({ conversation }: MessageViewProps) {
           </div>
           <div>
             <h2 className="font-bold text-white">
-              {conversation.peerAddress.slice(0, 6)}...
-              {conversation.peerAddress.slice(-4)}
+              {formatAddressOrENS(conversation.peerAddress, ensName)}
             </h2>
             <div className="text-xs text-blue-100">Active now</div>
           </div>
@@ -135,18 +172,23 @@ export function MessageView({ conversation }: MessageViewProps) {
         <div ref={messagesEndRef} />
       </div>
       <div className="p-4 border-t border-gray-200 bg-white">
+        {sendError && (
+          <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+            {sendError}
+          </div>
+        )}
         <div className="flex gap-3">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+            onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
             placeholder="Type a message..."
             className="input-field flex-1"
           />
           <button
             onClick={sendMessage}
-            disabled={!newMessage.trim()}
+            disabled={!newMessage.trim() || isLoading}
             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none font-semibold"
           >
             Send
