@@ -5,7 +5,7 @@ import { WalletConnect } from "@/components/WalletConnect";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 md:p-24">
+    <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 md:p-24">
       <div className="w-full max-w-2xl text-center space-y-8">
         {/* Hero Section */}
         <div className="space-y-4">

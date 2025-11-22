@@ -16,6 +16,7 @@ export default function ChatPage() {
   const { isConnected } = useAccount();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [currentAction, setCurrentAction] = useState<string | null>(null);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const handleAction = (action: string) => {
     setCurrentAction(action);
@@ -25,7 +26,7 @@ export default function ChatPage() {
 
   if (!isConnected) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center p-8 md:p-24">
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-8 md:p-24">
         <div className="text-center space-y-6 max-w-md">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             NeetChat
@@ -38,16 +39,43 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="flex h-screen relative bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="flex flex-col w-64 bg-white border-r border-gray-200 shadow-sm">
+    <main className="flex h-[calc(100vh-4rem)] relative bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Mobile Sidebar Toggle */}
+      {selectedConversation && (
+        <button
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="md:hidden fixed top-20 left-4 z-30 p-2 bg-white rounded-lg shadow-lg border border-gray-200"
+        >
+          {showSidebar ? "✕" : "☰"}
+        </button>
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 fixed md:static inset-y-0 left-0 z-20 flex flex-col w-64 bg-white border-r border-gray-200 shadow-lg md:shadow-sm transition-transform duration-300`}
+      >
         <ChatList
-          onSelectConversation={setSelectedConversation}
+          onSelectConversation={(conv) => {
+            setSelectedConversation(conv);
+            setShowSidebar(false);
+          }}
           selectedConversation={selectedConversation || undefined}
         />
         <div className="p-4 border-t border-gray-200 bg-gray-50">
           <SelfVerification />
         </div>
       </div>
+
+      {/* Overlay for mobile */}
+      {showSidebar && (
+        <div
+          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-10"
+          onClick={() => setShowSidebar(false)}
+        />
+      )}
+
       <MessageView conversation={selectedConversation} />
       <MiniAppPanel onAction={handleAction} />
       
