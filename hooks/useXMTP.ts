@@ -88,6 +88,18 @@ export function useXMTP() {
     }
   };
 
-  return { client, isLoading, error, initializeXMTP };
+  const startConversation = async (address: string) => {
+    if (!client || !address) return null;
+    
+    try {
+      const conversation = await client.conversations.newConversation(address);
+      return conversation;
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      throw error;
+    }
+  };
+
+  return { client, isLoading, error, initializeXMTP, startConversation };
 }
 
