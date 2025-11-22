@@ -1,6 +1,7 @@
+"use client";
+
 import Link from "next/link";
 import { WalletConnect } from "@/components/WalletConnect";
-import { useAccount } from "wagmi";
 
 export default function Home() {
   return (
