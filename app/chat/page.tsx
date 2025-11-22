@@ -41,14 +41,13 @@ export default function ChatPage() {
   return (
     <main className="flex h-[calc(100vh-4rem)] relative bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Mobile Sidebar Toggle */}
-      {selectedConversation && (
-        <button
-          onClick={() => setShowSidebar(!showSidebar)}
-          className="md:hidden fixed top-20 left-4 z-30 p-2 bg-white rounded-lg shadow-lg border border-gray-200"
-        >
-          {showSidebar ? "✕" : "☰"}
-        </button>
-      )}
+      <button
+        onClick={() => setShowSidebar(!showSidebar)}
+        className="md:hidden fixed top-20 left-4 z-30 p-2 bg-white rounded-lg shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+        aria-label="Toggle sidebar"
+      >
+        {showSidebar ? "✕" : "☰"}
+      </button>
 
       {/* Sidebar */}
       <div
