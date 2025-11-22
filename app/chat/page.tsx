@@ -4,12 +4,20 @@ import { useState } from "react";
 import { Conversation } from "@xmtp/xmtp-js";
 import { ChatList } from "@/components/ChatList";
 import { MessageView } from "@/components/MessageView";
+import { MiniAppPanel } from "@/components/MiniAppPanel";
 import { useAccount } from "wagmi";
 import { WalletConnect } from "@/components/WalletConnect";
 
 export default function ChatPage() {
   const { isConnected } = useAccount();
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [currentAction, setCurrentAction] = useState<string | null>(null);
+
+  const handleAction = (action: string) => {
+    setCurrentAction(action);
+    // TODO: Implement action handlers
+    console.log("Action triggered:", action);
+  };
 
   if (!isConnected) {
     return (
@@ -24,12 +32,13 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="flex h-screen">
+    <main className="flex h-screen relative">
       <ChatList
         onSelectConversation={setSelectedConversation}
         selectedConversation={selectedConversation || undefined}
       />
       <MessageView conversation={selectedConversation} />
+      <MiniAppPanel onAction={handleAction} />
     </main>
   );
 }
