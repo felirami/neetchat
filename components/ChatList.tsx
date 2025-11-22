@@ -23,6 +23,7 @@ export function ChatList({ onSelectConversation, selectedConversation }: ChatLis
     if (!client) return;
 
     async function loadConversations() {
+      if (!client) return;
       setIsLoading(true);
       try {
         // Filter by consent state to show only allowed conversations (spam-free)
