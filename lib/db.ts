@@ -5,12 +5,14 @@ let pool: Pool | null = null;
 
 export function getDbPool(): Pool {
   if (!pool) {
+    // On macOS with Homebrew, default user is the current system user
+    const defaultUser = process.env.USER || process.env.USERNAME || "postgres";
     pool = new Pool({
       host: process.env.DB_HOST || "localhost",
       port: parseInt(process.env.DB_PORT || "5432"),
       database: process.env.DB_NAME || "neetchat",
-      user: process.env.DB_USER || "postgres",
-      password: process.env.DB_PASSWORD || "postgres",
+      user: process.env.DB_USER || defaultUser,
+      password: process.env.DB_PASSWORD || "",
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
