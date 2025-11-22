@@ -29,17 +29,28 @@ export function WalletConnect() {
     );
   }
 
+  // Prioritize WalletConnect for mobile-first
+  const sortedConnectors = [...connectors].sort((a, b) => {
+    if (a.name.toLowerCase().includes("walletconnect")) return -1;
+    if (b.name.toLowerCase().includes("walletconnect")) return 1;
+    return 0;
+  });
+
   return (
     <div className="flex flex-col gap-3 w-full max-w-md">
-      {connectors.map((connector) => (
-        <button
-          key={connector.uid}
-          onClick={() => connect({ connector })}
-          className="btn-primary w-full"
-        >
-          🔗 Connect {connector.name}
-        </button>
-      ))}
+      {sortedConnectors.map((connector) => {
+        const isWalletConnect = connector.name.toLowerCase().includes("walletconnect");
+        return (
+          <button
+            key={connector.uid}
+            onClick={() => connect({ connector })}
+            className={`btn-primary w-full ${isWalletConnect ? "ring-2 ring-purple-400 ring-offset-2" : ""}`}
+          >
+            {isWalletConnect ? "📱" : "🔗"} Connect {connector.name}
+            {isWalletConnect && <span className="ml-2 text-xs opacity-75">(Mobile)</span>}
+          </button>
+        );
+      })}
     </div>
   );
 }
