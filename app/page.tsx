@@ -45,6 +45,7 @@ export default function Home() {
           <Link
             href="/chat"
             className="btn-primary inline-block"
+            suppressHydrationWarning
           >
             Go to Chat →
           </Link>

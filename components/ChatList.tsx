@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Conversation } from "@xmtp/xmtp-js";
 import { useXMTP } from "@/hooks/useXMTP";
+import { XMTPStatus } from "./XMTPStatus";
 
 interface ChatListProps {
   onSelectConversation: (conversation: Conversation) => void;
@@ -34,8 +35,9 @@ export function ChatList({ onSelectConversation, selectedConversation }: ChatLis
 
   if (!client) {
     return (
-      <div className="p-6 text-center">
-        <div className="text-gray-400 text-sm">Connect wallet to see conversations</div>
+      <div className="p-6 text-center space-y-4">
+        <div className="text-gray-400 text-sm">XMTP not initialized</div>
+        <XMTPStatus />
       </div>
     );
   }
